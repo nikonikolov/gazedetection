@@ -7,10 +7,14 @@
 #include "jpeg/jpeg.h"
 #include <assert.h>
 #include <iostream>
+#include <math.h>
 #include "pixel/pixel.hpp"
 #include "image/image.hpp"
 typedef unsigned char byte;
 #define FIL_DIM 3		//Note: must be an odd number
+#define WHITE 255
+#define BLACK 0
+#define TRESHOLD 20
 using std::cin;
 using std::cout;
 using std::cerr;
@@ -26,6 +30,7 @@ void convolute(double filter[FIL_DIM][FIL_DIM], const Image& input, const int y,
 void apply_filter(double filter[FIL_DIM][FIL_DIM], const Image& input, Image& output);
 void array_to_image(unsigned char** in, Image& out);
 void image_to_array(Image& in, unsigned char** out);
+void find_color(const Pixel& color, const int& treshold, const Image& input, Image& output);
 
 int main(int argc, char *argv[])
 {
@@ -210,4 +215,18 @@ void image_to_array(Image& in, unsigned char** out){
     	}
     }
 
+}
+
+void find_color(const Pixel& color, const int& treshold, const Image& input, Image& output){
+	for(int y=0; y<input.height(); y++){
+		for(int x=0; x<input.width(); x++){
+			int distance=sqrt(pow(((char)(color.red()-input[y][x].red())) , 2) + pow(((char)(color.green()-input[y][x].green())) , 2) +pow(((char)(color.blue()-input[y][x].blue())), 2));
+			if(distance<=treshold){
+				output[y][x].set_intensity(WHITE);
+			}
+			else{
+				output[y][x].set_intensity(BLACK);
+			}
+		}
+}
 }

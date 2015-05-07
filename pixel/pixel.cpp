@@ -18,15 +18,15 @@
 		pblue=grayscale_in;
 	}*/
 
-	unsigned char Pixel::red(){
+	unsigned char Pixel::red() const{
 		return pred;
 	}
 
-	unsigned char Pixel::green(){
+	unsigned char Pixel::green() const{
 		return pgreen;
 	}
 
-	unsigned char Pixel::blue(){
+	unsigned char Pixel::blue() const{
 		return pblue;
 	}
 
@@ -46,7 +46,7 @@
 		pblue=blue_in;
 	}
 
-	void Pixel::set_intensity(const unsigned int& intensity_in){
+	void Pixel::set_intensity(const unsigned char& intensity_in){
 		pred=intensity_in;
 		pgreen=intensity_in;
 		pblue=intensity_in;
