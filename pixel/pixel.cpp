@@ -56,7 +56,6 @@
 		pred=pix_in.pred;
 		pgreen=pix_in.pgreen;
 		pblue=pix_in.pblue;
-
 	}
 
 	ostream& operator<<(ostream& out, const Pixel& pix_in){
