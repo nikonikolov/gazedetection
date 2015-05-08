@@ -10,6 +10,8 @@
 #include <math.h>
 #include "pixel/pixel.hpp"
 #include "image/image.hpp"
+#include "process_loci/process_loci.cpp"
+
 typedef unsigned char byte;
 #define FIL_DIM 3		//Note: must be an odd number
 #define WHITE 255
@@ -33,7 +35,7 @@ void image_to_array(Image& in, unsigned char** out);
 void find_color(const Pixel& color, const int& treshold, const Image& input, Image& output);
 
 int main(int argc, char *argv[])
-{
+{ 
 
 	double blur[3][3]={{1.0/9, 1.0/9, 1.0/9}, {1.0/9, 1.0/9, 1.0/9}, {1.0/9, 1.0/9, 1.0/9}};
 
@@ -58,7 +60,7 @@ int main(int argc, char *argv[])
     //cout<<"width "<<width<<endl;
 
     //Image inimage (height, width), outimage(height, width);
-    Image* inptr=new Image(height, width);
+    Image* inptr = new Image(height, width);
     Image &inimage=*inptr;
 
     // extract the components
@@ -74,21 +76,49 @@ int main(int argc, char *argv[])
     Image* outptr=new Image(height, width);
     Image &outimage=*outptr;
 
+////
+    Pixel dark;//= new Pixel((char)255, (char)255, (char)255);
+    dark.set_rgb(0,0,0);
+
+    Pixel treshold;
+    treshold.set_rgb(10,10,20);
+
+    Process_loci processor;
+    //processor.find_center(inimage, white, tresh_5, 675, 334, 100, 50);
+    
+    //for s1, s2, s3
+    int irisX;
+    /*processor.find_center(inimage, dark, treshold, 700, 328, 100, 50,
+                        0, 10.0, irisX);*/
+
+    //For vid1
+    //processor.find_center(inimage, dark, treshold, 640, 235, 80, 45,
+    //                    30, 10.0, irisX);
+
+    //For vid2
+    //processor.find_center(inimage, dark, treshold, 486, 271, 90, 50,
+    //                    30, 10.0, irisX);
+
+    processor.find_center(inimage, dark, treshold, 545, 217, 70, 50,
+                    30, 10.0, irisX);
+////
+
     //apply the filter
     apply_filter(blur, inimage, outimage);
-
+    
+    
     delete inptr;
 
     //initialize output array
     image_out=new unsigned char* [height];
     for(int y=0; y<height; y++){
-       	image_out[y]=new unsigned char [width*components_count];
+       	image_out[y] = new unsigned char [width * components_count];
     }
 
     //convert the output image in appropriate type
     image_to_array(outimage, image_out);
 
-    delete outptr;
+    //delete outptr;
 
     // encode into intended file format
     int output_file_type = get_file_type(argv[2]);
@@ -112,6 +142,7 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
 
 //****************************************************************************************************
 //										FUNCTION DEFINITIONS
