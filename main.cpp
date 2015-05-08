@@ -99,8 +99,10 @@ int main(int argc, char *argv[])
     //processor.find_center(inimage, dark, treshold, 486, 271, 90, 50,
     //                    30, 10.0, irisX);
 
-    processor.find_center(inimage, dark, treshold, 545, 217, 70, 50,
-                    30, 10.0, irisX);
+    //processor.find_center(inimage, dark, treshold, 545, 217, 70, 50,
+    //                30, 10.0, irisX);
+
+    processor.image_yuv_channelY(inimage);
 ////
 
     //apply the filter

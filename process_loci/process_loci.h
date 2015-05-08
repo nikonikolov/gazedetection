@@ -19,10 +19,14 @@ private:
 	bool is_match(Pixel& pixel, Pixel color, Pixel treshold);
 	int map_value(int value, int inMin, int inMax, int outMin, int outMax);
 
+	void RGB_to_YUV(double &Y, double &U, double &V, const double R, const double G, const double B);
+
 public:
 	void find_center(const Image& input, Pixel color, Pixel treshold,
 					int boxX, int boxY, int boxW, int boxH, int brightness_adjust, double contrast_adjust,
 					int &xRelative);
+
+	void image_yuv_channelY(const Image& img);
 };
 
 
