@@ -107,10 +107,37 @@ void image_to_array(Image& in, unsigned char** out){
 
 }
 
+//CONVERTS TO VALUE THAT CAN BE OUTPUT TO AN IMAGE, VLAUE BETWEEN 0 AND 255
+byte rgb_to_v_int(const Pixel& in){	
+
+	int value=max( (max( (int)in.red(), (int)in.green() )), ((int)in.blue()) );
+	return (byte)value;
+
+}
+
+//converts rgb to HSV and returns V; value between 0 and 1
+double rgb_to_v(const Pixel& in){
+	
+	int m=max( (max( (int)in.red(), (int)in.green() )), ((int)in.blue()) );
+	double value=m/255.0;
+	return value;
+
+}
+
+// CONVERTS TO HSL AND RETURNS L CHANNEL
+byte rgb_to_l(const Pixel& in){
+	int tmin=min( (min( (int)in.red(), (int)in.green() )), ((int)in.blue()) );
+	int tmax=max( (max( (int)in.red(), (int)in.green() )), ((int)in.blue()) );
+	return (byte)((tmin+tmax)/2);
+}
+
+//finds a particular color in the image
 void find_color(const Pixel& color, const int& treshold, const Image& input, Image& output){
 	for(int y=0; y<input.height(); y++){
 		for(int x=0; x<input.width(); x++){
-			int distance=sqrt(pow(((char)(color.red()-input[y][x].red())) , 2) + pow(((char)(color.green()-input[y][x].green())) , 2) +pow(((char)(color.blue()-input[y][x].blue())), 2));
+			
+			int distance=sqrt(pow(((char)(color.red()-input[y][x].red())) , 2) + pow(((char)(color.green()-input[y][x].green())) , 2) 
+				+ pow(((char)(color.blue()-input[y][x].blue())), 2));
 			if(distance<=treshold){
 				output[y][x].set_intensity(WHITE);
 			}
@@ -118,8 +145,35 @@ void find_color(const Pixel& color, const int& treshold, const Image& input, Ima
 				output[y][x].set_intensity(BLACK);
 			}
 		}
+	}
 }
+
+//converts image to another color space
+void convert(const Image& input, Image& output){
+	int y,x, sum=0;
+
+	for( y=0; y<input.height(); y++){
+		for( x=0; x<input.width(); x++){
+			
+			//byte value=rgb_to_v_int(input[y][x]);
+			//output[y][x].set_intensity(value);
+			
+			
+		
+			//double value=rgb_to_v(input[y][x]);
+			//if(value<TRESHOLD) output[y][x].set_intensity(WHITE);
+			//else output[y][x].set_intensity(BLACK);
+
+			byte value=rgb_to_l(input[y][x]);
+			//output[y][x].set_intensity(value);
+			if(abs(COLOR-value)<TRESHOLD) output[y][x].set_intensity(WHITE);
+			else output[y][x].set_intensity(BLACK);
+			//sum=sum+value;
+			//cout<<(int)value<<endl;
+		}
+	}
+	//cout<<"average="<<sum/(y*x)<<endl;
+
 }
 
-
-
+//void treshold(const int& tresh, const Image& input, Image& output){}

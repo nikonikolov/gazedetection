@@ -24,9 +24,16 @@ using std::endl;
 int main(int argc, char *argv[])
 { 
 
-	double blur[3][3]={{1.0/9, 1.0/9, 1.0/9}, {1.0/9, 1.0/9, 1.0/9}, {1.0/9, 1.0/9, 1.0/9}};
+    double blur3[3][3]={{1.0/9, 1.0/9, 1.0/9}, {1.0/9, 1.0/9, 1.0/9}, {1.0/9, 1.0/9, 1.0/9}};
 
-	assert(argc >= 3 && "Expected input file name and output file name as CLI argument!!");
+    double blur5[5][5]={ {1.0/25, 1.0/25, 1.0/25, 1.0/25, 1.0/25}, 
+                         {1.0/25, 1.0/25, 1.0/25, 1.0/25, 1.0/25}, 
+                         {1.0/25, 1.0/25, 1.0/25, 1.0/25, 1.0/25},
+                         {1.0/25, 1.0/25, 1.0/25, 1.0/25, 1.0/25},
+                         {1.0/25, 1.0/25, 1.0/25, 1.0/25, 1.0/25},
+                        };
+
+    assert(argc >= 3 && "Expected input file name and output file name as CLI argument!!");
     int height, width, components_count;
     unsigned char ** image_in;
     unsigned char ** image_out;
@@ -42,11 +49,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    //cout<<"components count is "<<components_count<<endl;
-    //cout<<"height "<<height<<endl;
-    //cout<<"width "<<width<<endl;
-
-    //Image inimage (height, width), outimage(height, width);
+    //INPUT IMAGE OBJECT
     Image* inptr = new Image(height, width);
     Image &inimage=*inptr;
 
@@ -59,11 +62,12 @@ int main(int argc, char *argv[])
     }
     delete[] image_in;
 
-    //Create output object
+    //OUTPUT IMAGE OBJECT
     Image* outptr=new Image(height, width);
     Image &outimage=*outptr;
 
-////
+    //**************************APPLY FUNCTIONS NOW*****************************
+
     Pixel dark;//= new Pixel((char)255, (char)255, (char)255);
     dark.set_rgb(0,0,0);
 
@@ -89,43 +93,56 @@ int main(int argc, char *argv[])
     //processor.find_center(inimage, dark, treshold, 545, 217, 70, 50,
     //                30, 10.0, irisX);
 
-    processor.image_yuv_channelY(inimage);
+    //processor.image_yuv_channelY(inimage);
 ////
 
+    //TMP IMAGE OBJECT
+    Image* tmpptr=new Image(height, width);
+    Image &tmpimage=*tmpptr;
+
     //apply the filter
-    apply_filter(blur, inimage, outimage);
+    apply_filter(blur5, inimage, tmpimage);
+    convert(tmpimage, outimage);
     
     
+    //********************************* STOP APPLYING FUNCTIONS ****************************
+    //**************************** MEMORY ABOUT TO BE DEALLOCATED***************************
+
+    //FREE INPUT IMAGE OBJECT
     delete inptr;
 
-    //initialize output array
+    //FREE TMP IMAGE OBJECT
+    delete tmpptr;
+
+    //OUTPUT ARRAY FOR LIBJPEG
     image_out=new unsigned char* [height];
     for(int y=0; y<height; y++){
-       	image_out[y] = new unsigned char [width * components_count];
+        image_out[y] = new unsigned char [width * components_count];
     }
 
     //convert the output image in appropriate type
     image_to_array(outimage, image_out);
 
-    //delete outptr;
+    //FREE OUTPUT IMAGE OBJECT
+    delete outptr;
 
     // encode into intended file format
     int output_file_type = get_file_type(argv[2]);
     switch(output_file_type) {
         case FILE_TYPE_JPEG:
-        	jpeg_encode(argv[2], height, width, components_count, image_out);
+            jpeg_encode(argv[2], height, width, components_count, image_out);
         break;
 
         default:
         case FILE_TYPE_ERR:
-        	cout << "Unkown output file type! Using default of jpeg" << endl;
-        	jpeg_encode(argv[2], height, width, components_count, image_out);
+            cout << "Unkown output file type! Using default of jpeg" << endl;
+            jpeg_encode(argv[2], height, width, components_count, image_out);
         break;
     }
 
     //Free the memory space
     for(int i = 0 ; i < height ; i++) {
-    	delete[] image_out[i];
+        delete[] image_out[i];
     }
     delete[] image_out;
 
@@ -133,3 +150,4 @@ int main(int argc, char *argv[])
 }
 
 //***********************************END*******************************************************
+

@@ -140,22 +140,31 @@
 		return (int)mapped;
 	}
 
-	void Process_loci::RGB_to_YUV(double &Y, double &U, double &V, const double R, const double G, const double B) {
+	void Process_loci::RGB_to_YUV(double& Y, double& U, double& V, const double& R, const double& G, const double& B) {
 		Y =  0.257 * R + 0.504 * G + 0.098 * B +  16;
 		U = -0.148 * R - 0.291 * G + 0.439 * B + 128;
 		V =  0.439 * R - 0.368 * G - 0.071 * B + 128;
+		//cout<<Y<<endl;
 	}
 
 	void Process_loci::image_yuv_channelY(const Image& img) {
-		for (int y = 0; y < img.height(); y++) {
-			for (int x = 0; x < img.width(); x++) {
+		double sum=0;
+		int y,x;
+		for (y = 0; y < img.height(); y++) {
+			for ( x = 0; x < img.width(); x++) {
 				double new_y, new_u, new_v;
 
 				RGB_to_YUV(new_y, new_u, new_v, (double)img[y][x].red(), (double)img[y][x].green(), (double)img[y][x].blue());
 
+				
+				sum= sum + new_y;
+
 				unsigned char new_intensity = (unsigned char)new_y;
+				cout<<(int)new_intensity<<endl;
+
 				img[y][x].set_intensity(new_intensity);
 			}
 		}
+		cout<<"sum="<<sum/((y)*(x))<<endl;
 	}
 
