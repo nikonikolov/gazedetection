@@ -23,9 +23,11 @@ C_UPPER_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+process_loci \
 pixel \
 . \
 jpeg \
 image \
+functions \
 file \
 

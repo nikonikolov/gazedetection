@@ -6,11 +6,9 @@
 #ifndef PROCESS_LOCI
 #define PROCESS_LOCI
 
-#include <cstdlib>
-//#include <math.h>
-#include "../pixel/pixel.h"
-#include "../image/image.h"
-//#include <../pixel/pixel.h>
+#include <math.h>
+#include <../image/image.h>
+#include <../pixel/pixel.h>
 
 class Process_loci{
 

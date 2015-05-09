@@ -4,7 +4,7 @@
  *  Created on: 5 May 2015
  *      Author: niko
  */
-#include "image.hpp"
+#include "image.h"
 
 	Image::Image (int height_in, int width_in){
 		iheight=height_in;

@@ -2,7 +2,7 @@
 #Requires libjpeg and libmagic
 
 #Files to compile
-SOURCES = file/file.cpp jpeg/jpeg.cpp image/image.cpp pixel/pixel.cpp main.cpp
+SOURCES = file/file.cpp jpeg/jpeg.cpp image/image.cpp pixel/pixel.cpp process_loci/process_loci.cpp functions/functions.cpp main.cpp
 #Output file
 OUTPUT = ./main
 #Libraries to include by absolute path. Not in use because flags can be used

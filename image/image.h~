@@ -4,7 +4,7 @@
  *  Created on: 5 May 2015
  *      Author: niko
  */
-#include "../pixel/pixel.hpp"
+#include "../pixel/pixel.h"
 
 class Image{
 

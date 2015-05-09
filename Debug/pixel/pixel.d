@@ -1,3 +1,3 @@
-pixel/pixel.d: ../pixel/pixel.cpp ../pixel/pixel.hpp
+pixel/pixel.d: ../pixel/pixel.cpp ../pixel/pixel.h
 
-../pixel/pixel.hpp:
+../pixel/pixel.h:

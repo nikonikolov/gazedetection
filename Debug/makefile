@@ -8,9 +8,11 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include process_loci/subdir.mk
 -include pixel/subdir.mk
 -include jpeg/subdir.mk
 -include image/subdir.mk
+-include functions/subdir.mk
 -include file/subdir.mk
 -include subdir.mk
 -include objects.mk

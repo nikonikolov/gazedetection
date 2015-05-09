@@ -4,7 +4,7 @@
  *  Created on: 5 May 2015
  *      Author: niko
  */
-#include "pixel.hpp"
+#include "pixel.h"
 
 	Pixel::Pixel(unsigned char red_in/*=0*/, unsigned char green_in/*=0*/, unsigned char blue_in/*=0*/){
 		pred=red_in;

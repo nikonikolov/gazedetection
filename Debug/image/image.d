@@ -1,6 +1,6 @@
-image/image.d: ../image/image.cpp ../image/image.hpp \
- ../image/../pixel/pixel.hpp
+image/image.d: ../image/image.cpp ../image/image.h \
+ ../image/../pixel/pixel.h
 
-../image/image.hpp:
+../image/image.h:
 
-../image/../pixel/pixel.hpp:
+../image/../pixel/pixel.h:
