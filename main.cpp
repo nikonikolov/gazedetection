@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <iostream>
 #include <math.h>
+#include <vector>
 #include "pixel/pixel.h"
 #include "image/image.h"
 #include "process_loci/process_loci.h"
@@ -32,6 +33,17 @@ int main(int argc, char *argv[])
                          {1.0/25, 1.0/25, 1.0/25, 1.0/25, 1.0/25},
                          {1.0/25, 1.0/25, 1.0/25, 1.0/25, 1.0/25},
                         };
+
+    int edge_x[3][3]={  {-1, 0, 1}, 
+                        {-2, 0, 2}, 
+                        {-1, 0, 1}
+                     };
+
+    int edge_y[3][3]={  {-1, -2, -1}, 
+                        { 0,  0,  0}, 
+                        { 1,  2,  1}
+                     };                 
+
 
     assert(argc >= 3 && "Expected input file name and output file name as CLI argument!!");
     int height, width, components_count;
@@ -65,6 +77,8 @@ int main(int argc, char *argv[])
     //OUTPUT IMAGE OBJECT
     Image* outptr=new Image(height, width);
     Image &outimage=*outptr;
+
+    vector<vector<int>> centre (height, vector<int>(width));
 
     //**************************APPLY FUNCTIONS NOW*****************************
 
@@ -101,9 +115,14 @@ int main(int argc, char *argv[])
     Image &tmpimage=*tmpptr;
 
     //apply the filter
-    apply_filter(blur5, inimage, tmpimage);
-    convert(tmpimage, outimage);
     
+    apply_filter(blur5, inimage, tmpimage);
+    convert(tmpimage, inimage);
+    //convert(tmpimage, outimage);
+    
+    morph_edge(inimage, outimage, centre);
+    //edge(edge_x, edge_y, inimage, outimage, centre);
+    find_centre(centre, outimage);
     
     //********************************* STOP APPLYING FUNCTIONS ****************************
     //**************************** MEMORY ABOUT TO BE DEALLOCATED***************************
