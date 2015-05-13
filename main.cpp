@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     Image* outptr=new Image(height, width);
     Image &outimage=*outptr;
 
-    vector<vector<int>> centre (height, vector<int>(width));
+    //vector<vector<int>> centre (height, vector<int>(width));
 
     //**************************APPLY FUNCTIONS NOW*****************************
 
@@ -116,13 +116,48 @@ int main(int argc, char *argv[])
 
     //apply the filter
     
+    /*
+    //NORMALIZATION
     apply_filter(blur5, inimage, tmpimage);
-    convert(tmpimage, inimage);
-    //convert(tmpimage, outimage);
+    grayscale(tmpimage, inimage);
+    normalize(inimage, outimage);
+    //NORMALIZATION END    
+    */
+
     
+    //SKIN
+    vector<vector<int>> invec (height/REGION, vector<int>(width/REGION));
+    vector<vector<int>> tmpvec (height/REGION, vector<int>(width/REGION));
+    vector<vector<int>> outvec (height/REGION, vector<int>(width/REGION));
+
+    for(int y=0; y<height/REGION; y++){
+        for(int x=0; x<width/REGION; x++){
+            invec[y][x]=0;
+            tmpvec[y][x]=0;
+            outvec[y][x]=0;
+        }
+    }
+
+    apply_filter(blur5, inimage, outimage);
+    skin(outimage, invec);
+    //dilation(invec, tmpvec);
+    //erosion(invec, outvec);
+    erosion(invec, tmpvec);
+    dilation(tmpvec, outvec);
+    skin_back(outimage, outvec);
+    //SKIN END
+    
+
+
+    /*
+    //FINDING CIRCLE
+    apply_filter(blur5, inimage, tmpimage);
+    convert(tmpimage, inimage);  
     morph_edge(inimage, outimage, centre);
     //edge(edge_x, edge_y, inimage, outimage, centre);
     find_centre(centre, outimage);
+    //FINDING CIRCLE END
+    */
     
     //********************************* STOP APPLYING FUNCTIONS ****************************
     //**************************** MEMORY ABOUT TO BE DEALLOCATED***************************

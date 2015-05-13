@@ -185,6 +185,37 @@ void find_color(const Pixel& color, const int& treshold, const Image& input, Ima
 	}
 }
 
+void grayscale(const Image& input, Image& output){
+	int y,x, sum=0;
+
+	for( y=0; y<input.height(); y++){
+		for( x=0; x<input.width(); x++){
+					
+			//GRAYSCALE
+			byte mean=(input[y][x].red() + input[y][x].green() + input[y][x].blue())/3;
+			
+			output[y][x].set_intensity(mean);
+			/*if(mean<TRESHOLD){
+				output[y][x].set_intensity(WHITE);
+			}
+			else{
+				output[y][x].set_intensity(BLACK);
+			}
+			*/
+		}
+	}
+	//cout<<"average="<<sum/(y*x)<<endl;
+
+}
+
+void YCbCr(double& Y, double& Cb, double& Cr, const Pixel& input) {
+	Y =  0.299 * input.red() + 0.587 * input.green() + 0.114 * input.blue();
+	Cb = -0.168935 * input.red() - 0.331665 * input.green() + 0.50059 * input.blue() + 128;
+	Cr =  0.499813 * input.red() - 0.418531 * input.green() - 0.081282 * input.blue() + 128;
+	//cout<<Y<<endl;
+}
+
+
 //CONVERTS IMAGE TO ANOTHER COLOR SPACE
 void convert(const Image& input, Image& output){
 	int y,x, sum=0;
@@ -192,6 +223,18 @@ void convert(const Image& input, Image& output){
 	for( y=0; y<input.height(); y++){
 		for( x=0; x<input.width(); x++){
 			
+			//YCbCr
+			double newY, newCb, newCr;
+			YCbCr(newY, newCb, newCr, input[y][x]);
+
+			//if(newCb>=103 && newCb<=121 && newCr>=146 && newCr<=168 ){
+			if(newCb>=77 && newCb<=127 && newCr>=133 && newCr<=173 && newY>80 ){
+				output[y][x].set_intensity(WHITE);
+			}
+			else{
+				output[y][x].set_intensity(BLACK);
+			}
+
 			//byte value=rgb_to_v_int(input[y][x]);
 			//output[y][x].set_intensity(value);
 			
@@ -207,17 +250,6 @@ void convert(const Image& input, Image& output){
 			//else output[y][x].set_intensity(BLACK);
 			//sum=sum+value;
 			//cout<<(int)value<<endl;
-		
-			//GRAYSCALE
-			byte mean=(input[y][x].red() + input[y][x].green() + input[y][x].blue())/3;
-			
-			//output[y][x].set_intensity(mean);
-			if(mean<TRESHOLD){
-				output[y][x].set_intensity(WHITE);
-			}
-			else{
-				output[y][x].set_intensity(BLACK);
-			}
 
 		}
 	}
@@ -382,4 +414,219 @@ void find_centre(vector<vector<int>>& centre, Image& output){
 }
 
 
+void normalize(const Image& input, Image& output){
+	for(int y=0; y<input.height(); y++){
+		for(int x=0; x<input.width(); x++){
+			int inew=( (input[y][x].red() - BLACK)*(NEWMAX-NEWMIN)/(WHITE-BLACK) ) + NEWMIN;
+			output[y][x].set_intensity((byte)inew);
+		}
+	}
+}
+
+void clear(const Image& input, Image& output){
+	for(int y=0; y<input.height(); y+=REGION){
+		for(int x=0; x<input.width(); x+=REGION){
+			int count=0;
+			//note segmentation fault because x+i or y+j goes out of the image; see skin if you need fix
+			for(int i=0; i<REGION; i++){
+				for(int j=0; j<REGION; j++){
+					if(input[y+j][x+i].red()==WHITE) count++;
+				}
+			}
+			
+			if(count<20){
+				for(int i=0; i<REGION; i++){
+					for(int j=0; j<REGION; j++){
+						output[y+j][x+i].set_intensity(BLACK);
+					}
+				}
+
+			}
+
+			else{
+				for(int i=0; i<REGION; i++){
+					for(int j=0; j<REGION; j++){
+						output[y+j][x+i].set_intensity(WHITE);
+					}
+				}
+
+			}
+		
+		}
+	}
+}
+
+void skin(const Image& input, vector<vector<int>>& bin){
+	int y,x, sum=0;
+
+	for( y=0; y<input.height(); y+=REGION){
+		for( x=0; x<input.width(); x+=REGION){
+			
+			int count=0;
+			
+			for(int i=0; i<REGION && (y+i)<input.height(); i++){
+				for(int j=0; j<REGION && (x+j)<input.width(); j++){
+					//YCbCr
+					double newY, newCb, newCr;
+					YCbCr(newY, newCb, newCr, input[y+i][x+j]);
+
+					//if(newCb>=103 && newCb<=121 && newCr>=146 && newCr<=168 ){
+					if(newCb>=77 && newCb<=127 && newCr>=133 && newCr<=173 && newY>80 )	count++;
+				
+				}
+			}
+			
+			if(count>20) bin[y/REGION][x/REGION]=1;
+			else bin[y/REGION][x/REGION]=0;
+			
+		}
+	}
+
+}
+
+
+//NOTE: output must be initialized to zeroes
+void dilation(const vector<vector<int>>& input, vector<vector<int>>& output){
+	
+	for(int y=(DILATION/2); y<(input.size() - (DILATION/2)) ; y++){
+		for(int x=(DILATION/2); x<( input[0].size() - (DILATION/2)); x++){
+
+			if(input[y][x]==0) continue;
+			
+			else{
+			
+				//square filter
+				/*for(int i=0; i<DILATION; i++){
+					for(int j=0; j<DILATION; j++){
+						output[y-(DILATION/2)+j][x -(DILATION/2)+i]=1;
+					}
+				}*/
+
+				//plus shaped filter
+				
+				output[y][x]=1;
+				output[y][x - (DILATION/2)]=1;
+				output[y][x + (DILATION/2)]=1;
+				output[y - (DILATION/2)][x]=1;
+				output[y + (DILATION/2)][x]=1;
+				
+						
+
+			}
+			
+
+		}
+	}
+}
+
+//NOTE: output must be initialized to zeroes
+void erosion(const vector<vector<int>>& input, vector<vector<int>>& output){
+	
+	for(int y=(EROSION/2); y<(input.size() - (EROSION/2)); y++){
+		for(int x=(EROSION/2); x<(input[0].size() -(EROSION/2)) ; x++){
+			
+			bool apply=true;
+
+			for(int i=0; i<EROSION && apply==true; i++){
+				for(int j=0; j<EROSION && apply==true; j++){
+					if(input[y-(EROSION/2)+j][x -(EROSION/2)+i]==0) apply=false;
+				}
+			}
+		
+			if(apply==true){
+				for(int i=0; i<EROSION && apply==true; i++){
+					for(int j=0; j<EROSION && apply==true; j++){
+						output[y-(EROSION/2)+j][x -(EROSION/2)+i]=1;
+					}
+				}
+			}
+
+		}
+	}
+}
+
+
+void skin_back(Image& input, const vector<vector<int>>& bin){
+	int y,x, sum=0;
+
+	for( y=0; y<input.height(); y+=REGION){
+		for( x=0; x<input.width(); x+=REGION){
+			
+			if(bin[y/REGION][x/REGION]==1){
+				for(int i=0; i<REGION && (y+i)<input.height(); i++){
+					for(int j=0; j<REGION && (x+j)<input.width(); j++){	
+						input[y+i][x+j].set_intensity(WHITE);
+					}
+				}
+			}
+			
+			else{
+				for(int i=0; i<REGION && (y+i)<input.height(); i++){
+					for(int j=0; j<REGION && (x+j)<input.width(); j++){	
+						input[y+i][x+j].set_intensity(BLACK);
+					}
+				}
+			}		
+
+		}
+	}
+
+}
+/*
+
+void expandtoedge(const vector<vector<int>>& bin, const int& ytop, const int& xtop, const int& ymax, const int&xmax, 
+					int& north, int& south, int&east, int&west){
+
+	north=(ytop+ymax)/2;
+	south=(ytop+ymax)/2;
+	west=(xtop+xmax)/2;
+	east=(xtop+xmax)/2;
+
+	for(int x=xtop+1; x<xmax-1; x++){
+		for(int y=ytop+1; ymax; y++){
+			
+			if(bin[y][x]==1) continue;
+			
+			else{
+				if(bin[])
+
+			}
+		}
+	}
+
+}
+
+void findnorth(const vector<vector<int>>& bin, int& y, int& x, const int& ytop, const int&xmax, int& north){
+		
+		bool northfound=false;
+
+	while(y>=ytop && x<xmax && (!northfound) ){
+		
+		if(bin[y-1][x+1]==0){
+			y=y-1;
+			x=x+1;
+			continue;
+		}
+
+		else if(bin[y-1][x]==0){
+			y=y-1;
+			continue;
+		}
+
+		else if(bin[y][x+1]==0){
+			x=x+1;
+			continue;
+		}
+	
+		else{
+			northfound=true;
+			north=y;
+		}
+
+
+	}
+
+}
+
+*/
 //void treshold(const int& tresh, const Image& input, Image& output){}

@@ -25,6 +25,14 @@ typedef unsigned char byte;
 #define TRESHOLD 110
 //#define TRESHOLD 0.15
 
+#define REGION 5
+#define EROSION 3
+#define DILATION 3
+
+#define NEWMIN 50
+#define NEWMAX 130
+
+
 #define RADIUS 201
 #define COLOR 220
 using std::cin;
@@ -43,8 +51,10 @@ void apply_filter(double filter[FIL_DIM][FIL_DIM], const Image& input, Image& ou
 void array_to_image(unsigned char** in, Image& out);
 void image_to_array(Image& in, unsigned char** out);
 void find_color(const Pixel& color, const int& treshold, const Image& input, Image& output);
+void grayscale(const Image& input, Image& output);
 byte rgb_to_v_int(const Pixel& in);
 double rgb_to_v(const Pixel& in);
+void YCbCr(double& Y, double& Cb, double& Cr, const Pixel& input);
 void convert(const Image& input, Image& output);
 byte rgb_to_l(const Pixel& in);
 //void treshold(const int& tresh, const Image& input, Image& output);
@@ -58,8 +68,16 @@ void edge(int filx[FIL_EDGE][FIL_EDGE], int fily[FIL_EDGE][FIL_EDGE], const Imag
 void convolute_edge(int filx[FIL_EDGE][FIL_EDGE], int fily[FIL_EDGE][FIL_EDGE], const Image& input, const int& y, const int& x, Image& output,
 					vector<vector<int>>& centre);
 
-
 void morph_edge(const Image& input, Image& output, vector<vector<int>>& centre);
+
+void normalize(const Image& input, Image& output);
+
+void clear(const Image& input, Image& output);
+
+void skin(const Image& input, vector<vector<int>>& bin);
+void dilation(const vector<vector<int>>& input, vector<vector<int>>& output);
+void erosion(const vector<vector<int>>& input, vector<vector<int>>& output);
+void skin_back(Image& input, const vector<vector<int>>& bin);
 
 #endif
 
